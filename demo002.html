@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #box {
+        width: 531px;
+        height: 531px;
+        margin: 50px auto;
+        position: relative;
+        background: url(images/back.png) no-repeat left top;
+    }
+
+    #pointer {
+        width: 174px;
+        height: 228px;
+        position: absolute;
+        background: url(images/pointer.png) no-repeat left top;
+        left: 178.5px;
+        z-index: 999;
+        cursor: pointer;
+        top: 132.5px;
+        transform-origin: 87px 133px;
+    }
+    </style>
+</head>
+
+<body>
+    <div id='box'>
+        <div id='pointer'></div>
+    </div>
+</body>
+<script>
+window.onload = function() {
+    var pointer = document.getElementById('pointer')
+    var quan = 1;//圈数
+    var deg = null;//角度
+    var sdeg = 0//初始角度
+    var odeg = 0//多余角度
+    var stopdeg = 0//总角度
+    var cishu = 3;//次数
+    var able = false//阀门
+    var timer = null//定时器
+    var xq = 0//整圈数
+    pointer.style.transform = 'rotate(' + sdeg + 'deg)'
+    var area = [
+        [1, 51, "未中奖"], //未中奖
+        [52, 102, "6等奖"], //6等奖
+        [103, 153, "5等奖"], //5等奖
+        [154, 203, "4等奖"], //4等奖
+        [204, 251, "3等奖"], //3等奖
+        [252, 307, "2等奖"], //2等奖
+        [307, 360, "1等奖"] //1等奖
+    ]
+	//判断是否中奖
+    function is(deg) {
+        var res = '未中奖'
+        for (var i = 0; i < area.length; i++) {
+            if (deg >= area[i][0] && deg <= area[i][1]) {
+                return res = area[i][2]
+            }
+        }
+    }
+	//中奖概率
+    var gailv = [
+        [200, "未中奖"],
+        [200, "6等奖"],
+        [200, "5等奖"],
+        [100, "4等奖"],
+        [100, "3等奖"],
+        [100, "2等奖"],
+        [100, "1等奖"]
+    ];
+	//设置多出角度
+    function set(real) {
+        var mindeg = 0;
+        var maxdeg = 0;
+        for (var i = 0; i < area.length; i++) {
+            if (real == area[i][2]) {
+                mindeg = area[i][0]
+                maxdeg = area[i][1]
+                return mindeg + Math.floor(Math.random() * (maxdeg - mindeg + 1))
+            }
+        }
+    }
+    pointer.addEventListener('click', function() {
+        if (!able) {
+            if (cishu === 0) {
+                alert('你的抽奖次数已耗尽！')
+            } else {
+                cishu = cishu - 1
+                cc = 5
+                deg = sdeg
+                var allarr = []
+                for (var i = 0; i < gailv.length; i++) {
+                    for (var j = 0; j < gailv[i][0]; j++) {
+                        allarr.push(gailv[i][1])
+                    }
+                }
+                var real = allarr[Math.floor(Math.random() * 1000)]//生成中奖结果
+                odeg = set(real)//生成中奖角度
+                stopdeg = quan * 360 + odeg
+                timer = setInterval(dong, 3)
+            }
+        }
+    })
+
+    function dong() {
+        able = true
+        deg = deg + cc
+        if (deg >= stopdeg) {
+            clearInterval(timer)
+            setTimeout(function() {
+                able = false
+                alert(is(odeg))
+            }, 500)
+        } else {
+            if (deg % 360 == 0) {
+                xq = xq + 1
+                if (xq == quan - 1) {
+                    cc = 1
+                }
+                pointer.style.transform = 'rotate(' + deg + 'deg)'
+            } else {
+              pointer.style.transform = 'rotate(' + deg + 'deg)'
+            }
+        }
+    }
+}
+</script>
+
+</html>
